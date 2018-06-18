@@ -1,9 +1,9 @@
 # Meetup Attendance Downloader
 
-A simple app that downloads a CSV of the next upcoming event.
+Easily download attendance CSV for the next Meetup event.
 
-This app is helpful for when an event venue needs an attendee list, and
-you want them to be able to help themselves.
+This simple web app is helpful for when an event venue needs an attendee
+list, and you want them to be able to help themselves.
 
 ## :hammer_and_wrench: Technologies Used
 
