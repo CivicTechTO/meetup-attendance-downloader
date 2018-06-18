@@ -11,16 +11,13 @@ app = Flask(__name__)
 
 GROUP_SLUG = 'Civic-Tech-Toronto'
 
-def get_data():
-    client = meetup.api.Client(MEETUP_API_KEY)
-    upcoming_events = client.GetEvents({'group_urlname': GROUP_SLUG, 'status': 'upcoming'})
-    next_event_id = upcoming_events.results[0]['id']
-    rsvps = client.GetRsvps({'urlname': GROUP_SLUG, 'event_id': next_event_id, 'rsvp': 'yes'})
-    return rsvps.results
-
 # Source: https://stackoverflow.com/questions/28011341/create-and-download-a-csv-file-from-a-flask-view
 @app.route('/')
 def download_log():
+    client = meetup.api.Client(MEETUP_API_KEY)
+
+    next_event = client.GetEvents({'group_urlname': GROUP_SLUG, 'status': 'upcoming'}).results[0]
+
     def generate():
         data = StringIO()
         w = csv.writer(data)
@@ -31,8 +28,11 @@ def download_log():
         data.seek(0)
         data.truncate(0)
 
+        next_event = client.GetEvents({'group_urlname': GROUP_SLUG, 'status': 'upcoming'}).results[0]
+        rsvps = client.GetRsvps({'urlname': GROUP_SLUG, 'event_id': next_event['id'], 'rsvp': 'yes'})
+
         # write each log item
-        for rsvp in get_data():
+        for rsvp in rsvps.results:
             w.writerow((
                 rsvp['member']['name'],
                 rsvp['guests'],
@@ -43,7 +43,8 @@ def download_log():
 
     # add a filename
     headers = Headers()
-    headers.set('Content-Disposition', 'attachment', filename='meetup-rsvps.csv')
+    date = datetime.fromtimestamp(next_event['time'] / 1000).strftime('%Y-%m-%d')
+    headers.set('Content-Disposition', 'attachment', filename='{}-civictechto-rsvps.csv'.format(date))
 
     # stream the response as the data is generated
     return Response(
