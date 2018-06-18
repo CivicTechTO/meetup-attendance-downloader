@@ -18,6 +18,7 @@ def get_data():
     rsvps = client.GetRsvps({'urlname': GROUP_SLUG, 'event_id': next_event_id, 'rsvp': 'yes'})
     return rsvps.results
 
+# Source: https://stackoverflow.com/questions/28011341/create-and-download-a-csv-file-from-a-flask-view
 @app.route('/')
 def download_log():
     def generate():
@@ -50,4 +51,4 @@ def download_log():
         mimetype='text/csv', headers=headers
     )
 
-app.run()
+app.run(port=PORT)
