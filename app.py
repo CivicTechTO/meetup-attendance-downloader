@@ -1,6 +1,6 @@
 import csv
 from datetime import datetime
-from flask import Flask, stream_with_context
+from flask import Flask, render_template, stream_with_context
 from io import StringIO
 import meetup.api
 from settings import *
@@ -9,8 +9,13 @@ from werkzeug.wrappers import Response
 
 app = Flask(__name__)
 
-# Source: https://stackoverflow.com/questions/28011341/create-and-download-a-csv-file-from-a-flask-view
 @app.route('/')
+def homepage():
+    pretty_title = MEETUP_GROUP_SLUG.replace('-', ' ')
+    return render_template('homepage.html', title=pretty_title)
+
+# Source: https://stackoverflow.com/questions/28011341/create-and-download-a-csv-file-from-a-flask-view
+@app.route('/download')
 def download_csv():
     client = meetup.api.Client(MEETUP_API_KEY)
 
