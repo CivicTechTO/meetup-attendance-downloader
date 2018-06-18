@@ -9,14 +9,12 @@ from werkzeug.wrappers import Response
 
 app = Flask(__name__)
 
-GROUP_SLUG = 'Civic-Tech-Toronto'
-
 # Source: https://stackoverflow.com/questions/28011341/create-and-download-a-csv-file-from-a-flask-view
 @app.route('/')
-def download_log():
+def download_csv():
     client = meetup.api.Client(MEETUP_API_KEY)
 
-    next_event = client.GetEvents({'group_urlname': GROUP_SLUG, 'status': 'upcoming'}).results[0]
+    next_event = client.GetEvents({'group_urlname': MEETUP_GROUP_SLUG, 'status': 'upcoming'}).results[0]
 
     def generate():
         data = StringIO()
@@ -28,8 +26,8 @@ def download_log():
         data.seek(0)
         data.truncate(0)
 
-        next_event = client.GetEvents({'group_urlname': GROUP_SLUG, 'status': 'upcoming'}).results[0]
-        rsvps = client.GetRsvps({'urlname': GROUP_SLUG, 'event_id': next_event['id'], 'rsvp': 'yes'})
+        next_event = client.GetEvents({'group_urlname': MEETUP_GROUP_SLUG, 'status': 'upcoming'}).results[0]
+        rsvps = client.GetRsvps({'urlname': MEETUP_GROUP_SLUG, 'event_id': next_event['id'], 'rsvp': 'yes'})
 
         # write each log item
         for rsvp in rsvps.results:
