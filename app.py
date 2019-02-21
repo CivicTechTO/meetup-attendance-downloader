@@ -9,6 +9,25 @@ from werkzeug.wrappers import Response
 
 app = Flask(__name__)
 
+whitelist_patterns = [pattern.strip() for pattern in MEETUP_EVENT_NAME_WHITELIST.split(",")]
+
+def filter_event_list(events):
+    filtered_events = []
+    for e in events:
+        # Case-insensitive string match
+        if any([(p.lower() in e['name'].lower()) for p in whitelist_patterns]):
+            filtered_events.append(e)
+
+    return filtered_events
+
+def get_next_event():
+    client = meetup.api.Client(MEETUP_API_KEY)
+
+    future_events = client.GetEvents({'group_urlname': MEETUP_GROUP_SLUG, 'status': 'upcoming'}).results
+    future_events = filter_event_list(future_events)
+    next_event = future_events[0]
+    return next_event
+
 @app.route('/')
 def homepage():
     pretty_title = MEETUP_GROUP_SLUG.replace('-', ' ')
@@ -18,10 +37,9 @@ def homepage():
 @app.route('/download')
 def download_csv():
     client = meetup.api.Client(MEETUP_API_KEY)
+    next_event = get_next_event()
 
-    next_event = client.GetEvents({'group_urlname': MEETUP_GROUP_SLUG, 'status': 'upcoming'}).results[0]
-
-    def generate():
+    def generate(event_id):
         data = StringIO()
         w = csv.writer(data)
 
@@ -31,8 +49,7 @@ def download_csv():
         data.seek(0)
         data.truncate(0)
 
-        next_event = client.GetEvents({'group_urlname': MEETUP_GROUP_SLUG, 'status': 'upcoming'}).results[0]
-        rsvps = client.GetRsvps({'urlname': MEETUP_GROUP_SLUG, 'event_id': next_event['id'], 'rsvp': 'yes'})
+        rsvps = client.GetRsvps({'urlname': MEETUP_GROUP_SLUG, 'event_id': event_id, 'rsvp': 'yes'})
 
         # write each log item
         for rsvp in rsvps.results:
@@ -51,7 +68,7 @@ def download_csv():
 
     # stream the response as the data is generated
     return Response(
-        stream_with_context(generate()),
+        stream_with_context(generate(next_event['id'])),
         mimetype='text/csv', headers=headers
     )
 

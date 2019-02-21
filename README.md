@@ -26,7 +26,23 @@ $ cp sample.env .env
 
 # Install dependencies
 $ pipenv install
+
+# Copy a configuration file and edit
+cp sample.env .env
 ```
+
+### Configuration
+
+The following things can be set via environment variable (and in the
+`.env` file):
+
+- `MEETUP_API_KEY` (required)
+- `MEETUP_GROUP_SLUG`: The group to work with. (required) Example:
+  `Civic-Tech-Toronto`
+- `MEETUP_EVENT_NAME_WHITELIST`. A comma-separated list of strings. This
+  will be used to find the next event, via case-insensitive match on
+Meetup event titles. Example: `hacknight, hack night`
+
 
 ### Run
 
