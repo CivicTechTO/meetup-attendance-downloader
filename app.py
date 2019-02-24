@@ -31,7 +31,8 @@ def get_next_event():
 @app.route('/')
 def homepage():
     pretty_title = MEETUP_GROUP_SLUG.replace('-', ' ')
-    return render_template('homepage.html', title=pretty_title)
+    next_event = get_next_event()
+    return render_template('homepage.html', title=pretty_title, event=next_event)
 
 # Source: https://stackoverflow.com/questions/28011341/create-and-download-a-csv-file-from-a-flask-view
 @app.route('/download')
