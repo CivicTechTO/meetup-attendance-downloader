@@ -25,13 +25,13 @@
         <div class="col-10">
           <h1 class="display-4">Well, hello there!</h1>
           <p>
-            <a href="{{ event.event_url }}">{{event.name }}</a>
-          </p>
-          <p>
             This simple app is provided to help our venue sponsors easily
             download a CSV version of the public RSVP list for our very next
             Meetup event. We accept RSVPs right up until start time, and this
             app will always provide an up-to-date list.
+          </p>
+          <p>
+            <a href="{{ event.event_url }}">{{event.name }}</a>
           </p>
           <p>
             Total RSVPs: {{ event.yes_rsvp_count }}
